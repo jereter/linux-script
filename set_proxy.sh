@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# 一键设置系统代理
+# 一键设置系统代理，用法：
+#   sudo bash <(curl -fsSL https://raw.githubusercontent.com/jereter/linux-script/main/set_proxy.sh) 192.168.3.197:7890
 
 set -euo pipefail
 
@@ -8,19 +9,21 @@ PROXY_FILE="/etc/profile.d/proxy.sh"
 # 必须是 root
 [ "$(id -u)" -eq 0 ] || { echo "请用 sudo 或 root 运行"; exit 1; }
 
-# 交互式输入代理地址
-echo "设置系统代理"
-read -p "请输入代理地址 (格式: IP:PORT 或 域名:PORT): " HOST_PORT
+# 必须带一个参数：IP:PORT 或 域名:PORT
+[ $# -eq 1 ] || { 
+    echo "用法: $0 <IP:PORT>"
+    echo "例: $0 192.168.3.197:7890"
+    echo "例: $0 127.0.0.1:7890" 
+    echo "例: $0 proxy.example.com:8080"
+    exit 1 
+}
 
-# 验证输入不为空
-if [ -z "$HOST_PORT" ]; then
-    echo "错误：代理地址不能为空"
-    exit 1
-fi
+HOST_PORT="$1"
 
 # 验证参数格式
 if [[ ! "$HOST_PORT" =~ ^[^:]+:[0-9]{1,5}$ ]]; then
-    echo "错误：参数格式应为 IP:PORT 或 域名:PORT"
+    echo "错误：参数格式不正确，应为 IP:PORT 或 域名:PORT"
+    echo "正确格式示例: 192.168.1.100:7890 或 proxy.com:8080"
     exit 1
 fi
 
@@ -43,6 +46,8 @@ if ! curl -fs --connect-timeout 5 --max-time 10 "$PROXY_URL" > /dev/null 2>&1; t
         echo "已取消设置"
         exit 1
     fi
+else
+    echo "代理连接测试成功"
 fi
 
 # 写入配置
@@ -54,10 +59,19 @@ EOF
 
 chmod +x "$PROXY_FILE"
 
-echo "系统代理已设为: $PROXY_URL"
 echo ""
-echo "注意："
-echo "1. 新打开的终端会自动生效"
-echo "2. 当前终端需要手动执行: source $PROXY_FILE"
-echo "3. 如需取消代理，运行: rm -f $PROXY_FILE"
-echo "4. 查看当前代理: env | grep -i proxy"
+echo "==========================================="
+echo "✅ 系统代理设置完成"
+echo "==========================================="
+echo "代理地址: $PROXY_URL"
+echo "配置文件: $PROXY_FILE"
+echo ""
+echo "📋 使用说明:"
+echo "  - 新打开的终端会自动生效"
+echo "  - 当前终端需要手动执行: source $PROXY_FILE"
+echo "  - 如需取消代理，运行: sudo rm -f $PROXY_FILE"
+echo "  - 查看当前代理: env | grep -i proxy"
+echo ""
+echo "🔍 验证代理是否生效:"
+echo "  curl -I http://www.google.com"
+echo "==========================================="
