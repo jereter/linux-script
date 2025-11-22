@@ -7,5 +7,5 @@ sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/jereter/linux-scrip
 
 Rocky Linux 一键设置远程代理IP: 
 ```bash
-sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/jereter/linux-script/main/set_proxy.sh)" -- 192.168.1.x:7890
+sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/jereter/linux-script/refs/heads/main/set_proxy.sh)" -- 192.168.1.x:7890
 ```
