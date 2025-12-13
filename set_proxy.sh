@@ -54,7 +54,7 @@ fi
 cat > "$PROXY_FILE" <<EOF
 export http_proxy="$PROXY_URL"
 export https_proxy="$PROXY_URL"
-export no_proxy="localhost,127.0.0.1,::1"
+export no_proxy="localhost,127.0.0.1,::1,172.16.0.0/12,192.168.0.0/16,.svc,.svc.cluster.local"
 EOF
 
 chmod +x "$PROXY_FILE"
